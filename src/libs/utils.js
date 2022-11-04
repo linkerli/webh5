@@ -3,8 +3,14 @@ import config from "@/config";
 import router from "@/router";
 import moment from "moment";
 import { Message } from "element-ui";
+import store from '@/store'
+import storage from '@/libs/storage';
 
 export default{
+  install(Vue) {
+    Vue.prototype.cf = this
+    this.$storage = Vue.prototype.$storage
+  },
   isPc() {
     var ua = navigator.userAgent;
 
@@ -103,9 +109,32 @@ export default{
     }
     scrollTop = (bodyScrollTop - documentScrollTop > 0) ? bodyScrollTop : documentScrollTop;
     return scrollTop;
-  }
+  },
+  async getToken() {
+    return storage.get("userInfo").then((res) => {
+        if (res && res.token) {
+            return res.token
+        }
+        return false
+    });
+  },
+  setLastRouter(to) {
+    var { name, query, params } = to;
+    var lastrouter = { name, query, params };
+    return storage.set("loastroute", lastrouter, true);
+  },
+  async getLastRouter() {
+    return storage.get("loastroute").then((res) => {
+      console.log(res,'loastroute')
+        let lastroute = res
+        if (!res) {
+            lastroute = {name: "index"}
+        }
+        return lastroute
+    });
+
+  },
 }
-export const getToken = () => {};
 
 export const isPc = () => {
   var ua = navigator.userAgent;
@@ -189,15 +218,8 @@ export const formatNumber = n => {
   n = n.toString();
   return n[1] ? n : "0" + n;
 };
-export const setLastRouter = to => {
-  var { name, query, params } = to;
-  var lastrouter = { name, query, params };
-  return setStorage("loastroute", lastrouter, true);
-};
 
-export const getLastRouter = () => {
-  return getStorage("loastroute");
-};
+
 
 export const isWeiXin = () => {
   var ua = window.navigator.userAgent.toLowerCase();
@@ -206,50 +228,6 @@ export const isWeiXin = () => {
   } else {
     return false;
   }
-};
-export const setStorage = (name, value, encode) => {
-  if (encode) {
-    if (isJSON(value)) value = appencode(JSON.stringify(value));
-    else value = appencode(value);
-  }
-  window.localStorage.setItem(name, value);
-  value = appdecode(value);
-  if (isJSON(value)) {
-    return JSON.parse(value);
-  } else {
-    return value;
-  }
-};
-
-export const removeStorage = name => {
-  var value = window.localStorage.removeItem(name);
-  if (value) {
-    return true;
-  } else {
-    return false;
-  }
-};
-
-export const clearStorage = () => {
-  var value = window.localStorage.clear();
-  if (value) {
-    return true;
-  } else {
-    return false;
-  }
-};
-
-export const getStorage = name => {
-  var value = window.localStorage.getItem(name);
-  if (!value) return "";
-  value = appdecode(value);
-  try {
-    return JSON.parse(value);
-  } catch (e) {
-    return value;
-  }
-
-  // return JSON.parse(value);
 };
 
 export const appencode = info => {
@@ -282,23 +260,6 @@ export const islogin = () => {
   var userInfo = getStorage("userInfo");
 
   return userInfo != null && userInfo.urid != undefined && userInfo.urid;
-};
-
-export const checklogin = to => {
-  if (!islogin()) {
-    this.confirm('当前页面需要登录后才可访问,前往登录页面?',"提醒",{
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    }).then(() => {
-      setLastRouter(to); //设置登陆后的调转
-      router.replace({ name: "login" });
-    }).catch(() => {
-      router.push({ name: "index" });
-    });
-  } else {
-    return true;
-  }
 };
 
 export const fromatMatchTime = e => {

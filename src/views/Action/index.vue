@@ -33,11 +33,11 @@
             window.addEventListener('resize',this.handleResize);
             this.throttledScrollHandler = throttle(300, this.handleScroll);
             document.addEventListener('scroll', this.throttledScrollHandler);
-            this.$nextTick(function() {
+            this.$nextTick(() => {
                 let that = this;
                 matchInfo({acid: this.$route.params.acid}).then((res) => {
-                    console.log(111)
                     if (res.status === 200) {
+                        that.$message.success(res.message);
                         that.matchinfo = res.data;
                         that.gattrs = res.data.registerform?JSON.parse(res.data.registerform):[]
                         that.flag   =   true;

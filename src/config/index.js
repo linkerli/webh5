@@ -4,7 +4,7 @@ export default {
      */
     baseUrl: {
         // dev: 'http://192.168.50.61:8095/',
-        dev: 'http://www.test.com:8999/',
+        dev: 'https://api.wenjuan.online/',
         pro: '/api/'
     },
     /**

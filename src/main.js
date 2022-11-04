@@ -7,6 +7,7 @@ import i18n from './lang'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css';
 import util from './libs/utils'
+import WechatService from './libs/wechat'
 import VHtmlPanel from '@/components/VHtmlPanel'
 // import './theme.scss'
 import { Loading, MessageBox, Message, Notification } from 'element-ui'
@@ -14,9 +15,12 @@ import '@/permission' // permission control
 import VueClipboard from 'vue-clipboard2'
 import VueResource from 'vue-resource'
 import md5 from 'js-md5';
+import StorageService from 'libs/storage'
 
-
+Vue.use(util)
+Vue.use(StorageService)
 Vue.use(ElementUI)
+Vue.use(WechatService)
 Vue.prototype.$loading = Loading.service
 Vue.prototype.$msgbox = MessageBox
 Vue.prototype.$alert = MessageBox.alert

@@ -20,8 +20,18 @@ const routes = [
     meta: {
       title: '问卷调查',
       showloading: false,
-      noLogin: true,
+      noLogin: false,
     },
+  },
+  {
+    path: "/login",
+    name: "login",
+    component: () =>
+        import(/* webpackChunkName: "login" */ "@/views/Login/Login.vue"),
+    meta: {
+        title: "登录",
+        noLogin: true,
+    }
   },
   // {
   //   path: '/',

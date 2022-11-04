@@ -3,7 +3,7 @@ import store from "@/store";
 import router from "@/router";
 import Qs from "qs";
 import { Message,MessageBox } from 'element-ui'
-import { removeStorage, goBack, getStorage } from "./utils";
+import utils from "./utils";
 import { getToken, getUid } from "./auth";
 
 class HttpRequest {
@@ -12,22 +12,10 @@ class HttpRequest {
     this.queue = {};
   }
   getInsideConfig() {
-    const config = {
+    return {
       baseURL: this.baseUrl,
-      timeout: 20000,
-      paramsSerializer: function(params) {
-        return Qs.stringify(params);
-      },
-      transformRequest: [
-        function(data) {
-          if (!data) {
-            data = {};
-          }
-          return Qs.stringify(data);
-        }
-      ]
+      timeout: 10e3,
     };
-    return config;
   }
   destroy(url) {
     delete this.queue[url];
@@ -36,8 +24,25 @@ class HttpRequest {
     // 请求拦截
     instance.interceptors.request.use(
       config => {
-        this.queue[url] = true;
-        return config;
+        let params = {}
+        let urid = localStorage.getItem('urid')
+        let token = localStorage.getItem('token')
+        if (urid && token) {
+          params = Object.assign(params, { urid, token });
+          // config.headers.common['Authorization'] = 'Bearer ' + store.getters.getUserInfo.token // 让每个请求携带token--['X-Token']为自定义key 请根据实际情况自行修改
+          }
+          console.log(params,'params')
+          switch (config.method.toUpperCase()) {
+              case 'GET':
+                  config.params = { ...params, ...config.params };
+                  break;
+              default:
+                  config.data = Qs.stringify({ ...params, ...config.data });
+                  config.params = { token: params.token };
+                  break;
+          }
+          
+          return config;
       },
       error => {
         return Promise.reject(error);
@@ -50,10 +55,22 @@ class HttpRequest {
         const { data } = res;
         if (data.status == 200 || data.statusCode == 200) {
           //!!TODO move 定制
+        } else if (data.status == 202 || data.statusCode == 201) {
+          MessageBox.confirm('当前页面需要登录后才可访问,前往登录页面?',{
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'success'
+          }).then(() => {
+            // console.log(to,'to')
+            //   utils.setLastRouter(to)
+              router.replace({name:'login'})
+          }).catch(() => {
+
+          });
         } else {
           Message({
             type: 'info',
-            message: data.message
+            message:data.message
           });
         }
 
