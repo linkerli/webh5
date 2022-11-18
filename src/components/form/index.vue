@@ -247,6 +247,7 @@ export default {
       this.$emit("addmemberfstatus",false);
     },
     submitinfo(){
+      console.log(this.ruleForm)
       this.$refs['ruleForm'].validate((valid) => {
         if(valid)
         {
@@ -261,10 +262,9 @@ export default {
                     //去重复
                     var loc = "";
                     for (let j = 0; j < this.ruleForm[i].length; j++) {
-                      loc += CodeToText[this.ruleForm[i][j]];
+                      loc += CodeToText[this.ruleForm[i][j]] + '/';
                     }
-                
-                    value.value =  loc;
+                    value.value =  loc.substring(0,loc.length-1);
                 }else{
                     value.value =  this.ruleForm[i];
                 }

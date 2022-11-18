@@ -1,7 +1,7 @@
 <template>
-    <div id="register">
+    <div>
         
-        <div class="page-container page-component">
+        <div v-if="!matchinfo.isuser" class="page-container page-component">
             <mvform :attrs="gattrs" @getAuth="addsuccess"></mvform>
             <transition name="back-top-fade">
                 <div class="page-component-up"
@@ -15,7 +15,14 @@
                 </div>
             </transition>
         </div>
-
+        <div v-else class="nobody">
+            <span>您的答卷已经提交，感谢您的参与！</span>
+            <el-steps :active="3" finish-status="success">
+                <el-step title="填写表单"></el-step>
+                <el-step title="提交表单"></el-step>
+                <el-step title="完成提交"></el-step>
+            </el-steps>
+        </div>
     </div>
 </template>
 <script>
@@ -117,5 +124,20 @@
 <style scoped lang="less">
 .page-container{
     max-width: 500px;
+}
+.nobody{
+    width: 320px;
+    height: 400px;
+    margin-top: 50px;
+    margin: 20px auto;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 14px;
+    box-sizing: border-box;
+    padding: 30px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-direction: column;
 }
 </style>
