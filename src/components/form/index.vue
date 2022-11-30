@@ -25,7 +25,7 @@
           <el-radio :label="a.value"  v-for ="(a,b) in v.options"></el-radio>
         </el-radio-group>
 
-        <el-select v-if="v.type==6" v-model="ruleForm[v.key_name]" clearable :placeholder="show?'Please select '+v.show_name : '请选择'+v.show_name">
+        <el-select v-if="v.type==10" v-model="ruleForm[v.key_name]" clearable :placeholder="show?'Please select '+v.show_name : '请选择'+v.show_name">
           <el-option
             v-for ="(a,b) in v.options"
             :key="a.value"
@@ -45,26 +45,26 @@
           @change="handleChange"
         >
         </el-cascader>
-        <!-- <div style="position:relative;">
+        <div style="position:relative;">
           <el-upload
             :multiple=false
-            :data="{imgkey:v.key_name}"
             :show-file-list="false"
-            :on-success="handleSuccess"
-            accept="image/*"
             list-type="picture-card"
-            v-if="v.type==5"
+            v-if="(v.type==5 || v.type==6)"
             class="upload-demo"
             :name="v.key_name"
-            :action="$ajax.uploadurl"
-            :before-upload="beforeAvatarUpload"
-            :on-progress="handleAvatarProgress"
+            action="/"
+            :http-request="beforeAvatarUpload"
           >
-            <img  :src="ruleForm[v.key_name]"  v-if="ruleForm[v.key_name]" class="el-upload-list__item-thumbnail">
+            <template v-if="ruleForm[v.key_name]">
+              <img  :src="ruleForm[v.key_name]"  v-if="v.type==5" class="el-upload-list__item-thumbnail" />
+              <i class="el-icon-paperclip" v-else></i>
+            </template>
+            
             <i class="el-icon-plus" v-else></i>
           </el-upload>
-          <i class="el-icon-close"  v-if="v.type==5&&ruleForm[v.key_name]"    @click="handleRemove(v.key_name)" style="position:absolute;top:-6px;left:142px;color:red;"></i>
-        </div> -->
+          <i class="el-icon-close"  v-if="ruleForm[v.key_name]"    @click="handleRemove(v.key_name)" style="position:absolute;top:-6px;left:142px;color:red;"></i>
+        </div>
 
       </el-form-item>
     </el-form>
@@ -97,6 +97,8 @@
 <script>
 import Cookies from 'js-cookie';
 import { regionData, CodeToText } from "element-china-area-data";
+import COS from 'cos-js-sdk-v5'
+import { getconfig } from '@/api/api'
 export default {
   props: ["attrs"],
   data(){
@@ -110,7 +112,9 @@ export default {
       matchinfos:this.matchinfo,
       payinfos:this.payinfo,
       memberinfos:this.memberinfo,
-      show:false
+      show:false,
+      uploadUrl: "https://cos.wenjuan.online/",
+      cos: null
     }
   },
   watch:{
@@ -203,14 +207,43 @@ export default {
       }
       this.loadingstate    =   false;
     },
-    beforeAvatarUpload(file) {
-      const isLt2M = file.size / 1024 / 1024 < 5;
-
-
-      if (!isLt2M) {
-        this.$message.error('上传图片大小不能超过 5MB!');
-      }
-      return  isLt2M;
+    beforeAvatarUpload(params) {
+      var file = params.file
+      let filename = 'wenjuanh5/'+  file.uid +  Math.ceil(Math.random()*1000000) + file.name
+      let that = this
+      if(file.size <= 1024*1024*3) {
+        //简单上传  适用于小文件上传，大文件建议使用分块上传
+        this.cos.putObject({
+          Bucket: 'gangan-1305592971', /* 必须 */
+          Region: 'ap-nanjing',     /* 存储桶所在地域，必须字段 */
+          Key: filename,          /* 必须 */ //这里一般用于做拼接字符上传文件名称
+          StorageClass: 'STANDARD',
+          Body: file, // 上传文件对象
+              onTaskReady:(progressData)=>{},//上传任务创建时的回调函数，返回一个 taskId，唯一标识上传任务，可用于上传任务的取消（cancelTask），停止（pauseTask）和重新开始（restartTask）
+              onProgress:(progressData)=>{},//文件上传中返回的事件，loaded: 文件大小, total: 已上传大小, speed: 上传速度, percent: 上传进度
+              onHashprogress:(progressData)=>{},//文件上传中返回的事件
+          },function(err,data){
+              console.log(err,data);  // 上传成功返回给你的
+              that.$set(that.ruleForm, params.filename, that.uploadUrl+filename);
+          })
+      } else {
+        //分片上传，适用于大文件的上传。一般根据情况选择使用
+        this.cos.sliceUploadFile({
+          Bucket: 'gangan-1305592971', /* 必须 */
+          Region: 'ap-nanjing',     /* 存储桶所在地域，必须字段 */
+          Key: filename,          /* 必须 */ //这里一般用于做拼接字符上传文件名称
+          StorageClass: 'STANDARD',
+          Body: file, // 上传文件对象
+              onTaskReady:(progressData)=>{
+                  // taskId = progressData,
+              },//上传任务创建时的回调函数，返回一个 taskId，唯一标识上传任务，可用于上传任务的取消（cancelTask），停止（pauseTask）和重新开始（restartTask）
+              onProgress:(progressData)=>{},//文件上传中返回的事件，loaded: 文件大小, total: 已上传大小, speed: 上传速度, percent: 上传进度
+              onHashprogress:(progressData)=>{},//文件上传中返回的事件
+          },function(err,data){
+              console.log(err,data);  // 上传成功返回给你的
+              that.$set(that.ruleForm, params.filename, that.uploadUrl+filename);
+          })
+      }  
     },
 
     handleAvatarProgress(){
@@ -281,6 +314,26 @@ export default {
   },
   mounted() {
     this.setOptions(this.attrs)
+    let _this = this; //改变指向，不然下面的methods内的cos.xxx方法找不到
+    _this.cos = new COS({
+      getAuthorization:(options,callback)=>{
+        getconfig({peoject:'wenjuanh5/*'}).then(res=>{
+          if(res.status === 200){
+            var credentials = res.data && res.data.credentials;
+            if (!res || !credentials) return console.error('credentials invalid');
+            callback({
+                TmpSecretId: credentials.tmpSecretId, //必须参数
+                TmpSecretKey: credentials.tmpSecretKey, //必须参数
+                XCosSecurityToken: credentials.sessionToken, //必须参数
+                // 建议返回服务器时间作为签名的开始时间，避免用户浏览器本地时间偏差过大导致签名错误
+                StartTime: res.data.startTime, // 时间戳，单位秒，如：1580000000
+                ExpiredTime: res.data.expiredTime, // 时间戳，单位秒，如：1580000900
+                // ScopeLimit: true, // 细粒度控制权限需要设为 true，会限制密钥只在相同请求时重复使用
+            });
+          }
+        })
+      }
+    })
   }
 }
 </script>

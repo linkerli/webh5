@@ -13,6 +13,7 @@
     "@babel/polyfill": "^7.12.1",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "cos-js-sdk-v5": "^1.4.14",
     "crypto-js": "^4.0.0",
     "element-china-area-data": "^5.0.2",
     "element-ui": "^2.15.2",

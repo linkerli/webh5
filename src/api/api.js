@@ -31,3 +31,10 @@ export const setfaceshare = data => {
     data
   });
 };
+export const getconfig = data => {
+  return axios.request({
+    url: "public/cosconfig",
+    method: "post",
+    data
+  });
+};
