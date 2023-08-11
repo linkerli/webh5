@@ -20,20 +20,13 @@ var checkLogin = (to, token, next,from) => {
                   // 未登录且要跳转的页面不是登录页 记录跳转地址后 登录成功后回调
                   MessageBox.confirm('当前页面需要登录后才可访问,前往登录页面?',{
                     confirmButtonText: '确定',
-                    cancelButtonText: '取消',
+                    showCancelButton: false,
                     type: 'success'
                   }).then(() => {
                       utils.setLastRouter(to)
                       next({
                           name: LOGIN_PAGE_NAME // 跳转到登录页
                       })
-                  }).catch(() => {
-                      if(from.name===null){
-                          next({
-                              name: homeName // 跳转到homeName页
-                          })
-                      }
-
                   });
 
               });
@@ -66,11 +59,11 @@ router.beforeEach(async(to, from, next) => {
     Message.error('请在微信中打开或使用微信扫描二维码');
     return
   }
-  
+  console.log(from,'from')
   let token = localStorage.getItem('token')
 
   checkLogin(to, token, next,from);
-  
+
   NProgress.done()
 
 })

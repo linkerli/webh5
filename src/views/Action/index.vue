@@ -1,7 +1,7 @@
 <template>
     <div>
-        
-        <div v-if="!matchinfo.isuser" class="page-container page-component">
+
+        <div v-loading="loading" class="page-container page-component">
             <mvform :attrs="gattrs" @getAuth="addsuccess"></mvform>
             <transition name="back-top-fade">
                 <div class="page-component-up"
@@ -14,14 +14,6 @@
                     <i class="el-icon-caret-top"></i>
                 </div>
             </transition>
-        </div>
-        <div v-else class="nobody">
-            <span>您的答卷已经提交，感谢您的参与！</span>
-            <el-steps :active="3" finish-status="success">
-                <el-step title="填写表单"></el-step>
-                <el-step title="提交表单"></el-step>
-                <el-step title="完成提交"></el-step>
-            </el-steps>
         </div>
     </div>
 </template>
@@ -36,6 +28,7 @@
             mvform
         },
         mounted(){
+            this.loading = true
             this.throttledresizeHandler = throttle(300, this.handleResize);
             window.addEventListener('resize',this.handleResize);
             this.throttledScrollHandler = throttle(300, this.handleScroll);
@@ -44,11 +37,28 @@
                 let that = this;
                 matchInfo({acid: this.$route.params.acid}).then((res) => {
                     if (res.status === 200) {
-                        that.$message.success(res.message);
                         that.matchinfo = res.data;
                         that.gattrs = res.data.registerform?JSON.parse(res.data.registerform):[]
-                        that.flag   =   true;
+                        if(res.data.jumpurl &&  res.data.jumpurl.indexOf('http') !==-1) {
+                          let urid = localStorage.getItem('urid')
+                          window.location.href = res.data.jumpurl+'?uid='+urid
+                          return
+                        }
+                        if(res.data.isuser) {
+                          if(res.data.id != 4) {
+                            this.$router.replace({name:'finish'})
+                            return
+                          }
+                          let userform = res.data.userform?JSON.parse(res.data.userform):{}
+                          that.gattrs.forEach((item)=>{
+                            if(item.type == 1)
+                              item.value = userform[item.key_name]||''
+                          })
+                        }
 
+                        that.flag   =   true;
+                        that.loading   =   false;
+                        document.title = res.data.title
                     } else {
                         that.$message.error(res.message);
                     }
@@ -68,7 +78,8 @@
                 }
                 submitmemberinfos(query).then(res=>{
                     if(res.status === 200){
-                        this.$message.success('感谢参与')
+                        // this.$message.success('感谢参与')
+                        this.$router.replace({name:'finish'})
                     }
                 })
             },
@@ -116,6 +127,7 @@
                 hover: false,
                 showBackToTop: false,
                 screenWidth:document.body.clientWidth,
+                loading: false
             }
         }
     }

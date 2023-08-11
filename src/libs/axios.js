@@ -41,7 +41,7 @@ class HttpRequest {
                   config.params = { token: params.token };
                   break;
           }
-          
+
           return config;
       },
       error => {
@@ -55,18 +55,18 @@ class HttpRequest {
         const { data } = res;
         if (data.status == 200 || data.statusCode == 200) {
           //!!TODO move 定制
-        } else if (data.status == 202 || data.statusCode == 201) {
-          MessageBox.confirm('当前页面需要登录后才可访问,前往登录页面?',{
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'success'
-          }).then(() => {
-            // console.log(to,'to')
-            //   utils.setLastRouter(to)
-              router.replace({name:'login'})
-          }).catch(() => {
+        // } else if (data.status == 202 || data.statusCode == 201) {
+          // MessageBox.confirm('当前页面需要登录后才可访问,前往登录页面?',{
+          //   confirmButtonText: '确定',
+          //   cancelButtonText: '取消',
+          //   type: 'success'
+          // }).then(() => {
+          //   // console.log(to,'to')
+          //   //   utils.setLastRouter(to)
+          //     router.replace({name:'login'})
+          // }).catch(() => {
 
-          });
+          // });
         } else {
           Message({
             type: 'info',

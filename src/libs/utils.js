@@ -257,7 +257,7 @@ export const goBack = url => {
 };
 
 export const islogin = () => {
-  var userInfo = getStorage("userInfo");
+  var userInfo = localStorage.getItem("userInfo");
 
   return userInfo != null && userInfo.urid != undefined && userInfo.urid;
 };

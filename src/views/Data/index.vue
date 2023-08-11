@@ -13,7 +13,7 @@
 </template>
 
 <script>
-  import { getList } from '@/api/activity'
+  import { getIndex } from '@/api/activity'
   import moment from 'moment'
   export default {
     data() {
@@ -45,7 +45,7 @@
           limit: 20
         }
         if(this.finished) return
-        getList(query).then(res=>{
+        getIndex(query).then(res=>{
           if(res.status === 200) {
             let { list, page, pages } = res.data
             if (page == 1) {
@@ -70,7 +70,7 @@
             type: 'success'
           }).then(() => {
             // console.log(to,'to')
-              // utils.setLastRouter(to)
+              this.cf.setLastRouter({name:'data'})
               this.$router.replace({name:'login'})
           }).catch(() => {
 

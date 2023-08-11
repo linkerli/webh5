@@ -14,11 +14,31 @@ const routes = [
     },
   },
   {
+    path: '/data',
+    name: 'data',
+    component: () => import('@/views/Data/index.vue'),
+    meta: {
+      title: '列表',
+      showloading: false,
+      noLogin: true,
+    },
+  },
+  {
     path: '/survey/:acid',
     name: 'survey',
     component: () => import('@/views/Action/index.vue'),
     meta: {
       title: '问卷调查',
+      showloading: false,
+      noLogin: false,
+    },
+  },
+  {
+    path: '/finish/:acid?',
+    name: 'finish',
+    component: () => import('@/views/Action/finish.vue'),
+    meta: {
+      title: '谢谢参与',
       showloading: false,
       noLogin: false,
     },

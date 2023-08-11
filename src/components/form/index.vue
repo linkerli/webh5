@@ -24,6 +24,14 @@
         <el-radio-group  v-if="v.type==3" v-model="ruleForm[v.key_name]" >
           <el-radio :label="a.value"  v-for ="(a,b) in v.options"></el-radio>
         </el-radio-group>
+        <el-date-picker
+          v-if="v.type==7"
+          v-model="ruleForm[v.key_name]"
+          value-format="yyyy-MM-dd HH:mm:ss"
+          type="datetime"
+          style="width:100%"
+          :placeholder="show?'Please input '+v.show_name : '请输入'+v.show_name">
+        </el-date-picker>
 
         <el-select v-if="v.type==10" v-model="ruleForm[v.key_name]" clearable :placeholder="show?'Please select '+v.show_name : '请选择'+v.show_name">
           <el-option
@@ -60,10 +68,10 @@
               <img  :src="ruleForm[v.key_name]"  v-if="v.type==5" class="el-upload-list__item-thumbnail" />
               <i class="el-icon-paperclip" v-else></i>
             </template>
-            
+
             <i class="el-icon-plus" v-else></i>
           </el-upload>
-          <i class="el-icon-close"  v-if="ruleForm[v.key_name]"    @click="handleRemove(v.key_name)" style="position:absolute;top:-6px;left:142px;color:red;"></i>
+          <!-- <i class="el-icon-close"  v-if="ruleForm[v.key_name]"  @click="handleRemove(v.key_name)" style="position:absolute;top:-6px;left:142px;color:red;font-size:20px;"></i> -->
         </div>
 
       </el-form-item>
@@ -131,9 +139,16 @@ export default {
         if(value.value){
           this.$set(this.ruleForm,value.key_name,value.value)
         }else{
-          if(value.type == 3||value.type == 9){
+          if(value.type == 3||value.type == 4||value.type == 9||value.type == 10){
             if(typeof(value.options)=='string') value.options = JSON.parse(value.options);
-            this.$set(this.ruleForm,value.key_name,value.options[0].value)
+            if(value.type == 4) {
+              this.$set(this.ruleForm,value.key_name,[value.options[0].value])
+            } else {
+              this.$set(this.ruleForm,value.key_name,value.options[0].value)
+            }
+
+          } else {
+            this.$set(this.ruleForm, value.key_name, '');
           }
         }
         let rules   =   [];
@@ -243,7 +258,7 @@ export default {
               console.log(err,data);  // 上传成功返回给你的
               that.$set(that.ruleForm, params.filename, that.uploadUrl+filename);
           })
-      }  
+      }
     },
 
     handleAvatarProgress(){
@@ -289,7 +304,7 @@ export default {
             {
               if(value.key_name==i)
               {
-                delete value.validaterules;               
+                delete value.validaterules;
                 if(value.type==8)
                 {
                     //去重复
@@ -301,7 +316,6 @@ export default {
                 }else{
                     value.value =  this.ruleForm[i];
                 }
-
               }
             }
           })
