@@ -15,7 +15,7 @@ module.exports = {
       port: 8080,
       proxy: {
         "/api/": {
-          target: 'https://api.wenjuan.online/',
+          target: 'http://wenjuan.test/',
           pathRewrite: { "^/api/": "" },
           secure: false,
           changeOrigin: true

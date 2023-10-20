@@ -24,6 +24,16 @@ const routes = [
     },
   },
   {
+    path: '/wx',
+    name: 'wx',
+    component: () => import('@/views/Wx/index.vue'),
+    meta: {
+      title: '列表',
+      showloading: false,
+      noLogin: true,
+    },
+  },
+  {
     path: '/survey/:acid',
     name: 'survey',
     component: () => import('@/views/Action/index.vue'),

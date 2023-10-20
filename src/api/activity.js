@@ -17,6 +17,14 @@ export const getIndex = params => {
   });
 };
 
+export const getWxIndex = params => {
+  return axios.request({
+    url: "enterprise-wechat/index",
+    method: "get",
+    params
+  });
+};
+
 export const getList = params => {
   return axios.request({
     url: "activity/list",

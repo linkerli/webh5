@@ -31,7 +31,7 @@ class HttpRequest {
           params = Object.assign(params, { urid, token });
           // config.headers.common['Authorization'] = 'Bearer ' + store.getters.getUserInfo.token // 让每个请求携带token--['X-Token']为自定义key 请根据实际情况自行修改
           }
-          console.log(params,'params')
+          // console.log(params,'params')
           switch (config.method.toUpperCase()) {
               case 'GET':
                   config.params = { ...params, ...config.params };
@@ -78,7 +78,7 @@ class HttpRequest {
         // return { data, status }
       },
       error => {
-        console.log(error)
+        // console.log(error)
         let message = error.message||error;
         Message({
           type: 'info',
