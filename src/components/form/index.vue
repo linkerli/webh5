@@ -142,9 +142,9 @@ export default {
           if(value.type == 3||value.type == 4||value.type == 9||value.type == 10){
             if(typeof(value.options)=='string') value.options = JSON.parse(value.options);
             if(value.type == 4) {
-              this.$set(this.ruleForm,value.key_name,[value.options[0].value])
+              this.$set(this.ruleForm,value.key_name,[])
             } else {
-              this.$set(this.ruleForm,value.key_name,value.options[0].value)
+              this.$set(this.ruleForm,value.key_name,'')
             }
 
           } else {
