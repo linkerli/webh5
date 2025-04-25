@@ -36,7 +36,7 @@ export const getList = params => {
 
 export const submitmemberinfos = data => {
   return axios.request({
-    url: "activity-user/submitcompare",
+    url: "activity/submit-suv",
     method: "post",
     data
   });
@@ -44,7 +44,7 @@ export const submitmemberinfos = data => {
 
 export const submitother = data => {
   return axios.request({
-    url: "activity-user/submitother",
+    url: "activity/submitother",
     method: "post",
     data
   });

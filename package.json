@@ -7,7 +7,7 @@
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "push": "vue-cli-service build && rsync -avz ./dist/ root@wenjun:/www/webh5"
+    "push": "vue-cli-service build && rsync -avz ./dist/ root@zhike:/home/www/webh5"
   },
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
@@ -36,6 +36,7 @@
     "vue-qr": "^2.5.0",
     "vue-resource": "^1.5.3",
     "vue-router": "^3.2.0",
+    "vue-signature": "^2.6.0",
     "vuex": "^3.4.0",
     "wechat-webview-bridge": "^1.0.1",
     "xlsx": "^0.17.4"

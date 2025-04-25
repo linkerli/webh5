@@ -1,50 +1,52 @@
 <template>
   <div id="form"  v-loading.fullscreen.lock="loadingstate">
     <el-form ref="ruleForm" :model="ruleForm" label-position="top">
-      <el-form-item v-for="(v,k) in attrs" :key="k" :label="v.show_name"  :prop="v.key_name"  :rules="v.validaterules" >
-
-        <el-input  v-if="v.type==1&&v.key_name!='mv_name'" v-model="ruleForm[v.key_name]" :placeholder="show?'Please input '+v.show_name : '请输入'+v.show_name"></el-input>
-        <el-input  v-if="v.type==1&&$route.name=='invitregister'&&v.key_name=='mv_name'" v-model="ruleForm[v.key_name]" ></el-input>
-
-        <el-autocomplete
-          v-if="v.key_name=='mv_name'&&$route.name!='invitregister'"
-          v-model="ruleForm[v.key_name]"
-          :fetch-suggestions="querySearch"
-          @select="handleSelect"
-          style="display:block;"
-          :placeholder="show?'Please input '+v.show_name : '请输入'+v.show_name"
-        ></el-autocomplete>
-
-
-
-        <el-input type="textarea"  v-if="v.type==2" v-model="ruleForm[v.key_name]"></el-input>
-
-
-
-        <el-radio-group  v-if="v.type==3" v-model="ruleForm[v.key_name]" >
-          <el-radio :label="a.value"  v-for ="(a,b) in v.options"></el-radio>
+      <el-form-item v-for="(v,k) in attrs" :key="k" :label="v.title"  :prop="v.key_name"  :rules="v.validaterules" >
+        
+        <el-input  v-if="v.type=='text'" v-model="ruleForm[v.key_name]" placeholder="请输入"></el-input>
+        <el-radio-group  v-if="v.type=='single'" v-model="ruleForm[v.key_name]" >
+          <el-radio :label="a.content"  v-for ="(a,b) in v.options" class="block"></el-radio>
         </el-radio-group>
+        <el-checkbox-group  v-if="v.type=='multiple'" v-model="ruleForm[v.key_name]">
+          <el-checkbox :label="a.content"   v-for ="(a,b) of v.options" class="block"></el-checkbox>
+        </el-checkbox-group>
+        <el-time-picker
+          v-if="v.type=='time'"
+          v-model="ruleForm[v.key_name]"
+          value-format="HH:mm:ss"
+          :picker-options="{
+            selectableRange: '08:30:00 - 17:30:00'
+          }"
+          style="width:100%"
+          placeholder="请选择">
+        </el-time-picker>
         <el-date-picker
-          v-if="v.type==7"
+          v-if="v.type=='date'"
+          v-model="ruleForm[v.key_name]"
+          value-format="yyyy-MM-dd"
+          type="date"
+          style="width:100%"
+          placeholder="请选择">
+        </el-date-picker>
+        <el-date-picker
+          v-if="v.type=='datetime'"
           v-model="ruleForm[v.key_name]"
           value-format="yyyy-MM-dd HH:mm:ss"
           type="datetime"
           style="width:100%"
-          :placeholder="show?'Please input '+v.show_name : '请输入'+v.show_name">
+          placeholder="请选择">
         </el-date-picker>
-
-        <el-select v-if="v.type==10" v-model="ruleForm[v.key_name]" clearable :placeholder="show?'Please select '+v.show_name : '请选择'+v.show_name">
+        <el-rate v-if="v.type=='rate'" v-model="ruleForm[v.key_name]"></el-rate>
+        <!-- <el-select v-if="v.type==10" v-model="ruleForm[v.key_name]" clearable :placeholder="show?'Please select '+v.show_name : '请选择'+v.show_name">
           <el-option
             v-for ="(a,b) in v.options"
             :key="a.value"
             :label="a.value"
             :value="a.value">
           </el-option>
-        </el-select>
-        <el-checkbox-group  v-if="v.type==4" v-model="ruleForm[v.key_name]">
-          <el-checkbox :label="a.value"   v-for ="(a,b) of v.options"></el-checkbox>
-        </el-checkbox-group>
-        <el-cascader
+        </el-select> -->
+
+        <!-- <el-cascader
           v-if="v.type==8"
           size="large"
           style="width: 100%;"
@@ -52,33 +54,54 @@
           v-model="ruleForm[v.key_name]"
           @change="handleChange"
         >
-        </el-cascader>
+        </el-cascader> -->
         <div style="position:relative;">
           <el-upload
             :multiple=false
             :show-file-list="false"
             list-type="picture-card"
-            v-if="(v.type==5 || v.type==6)"
+            v-if="v.type=='upload'"
             class="upload-demo"
             :name="v.key_name"
             action="/"
             :http-request="beforeAvatarUpload"
           >
             <template v-if="ruleForm[v.key_name]">
-              <img  :src="ruleForm[v.key_name]"  v-if="v.type==5" class="el-upload-list__item-thumbnail" />
-              <i class="el-icon-paperclip" v-else></i>
+              <img :src="ruleForm[v.key_name]" class="el-upload-list__item-thumbnail" />
+              <!-- <i class="el-icon-paperclip" v-else></i> -->
             </template>
 
             <i class="el-icon-plus" v-else></i>
           </el-upload>
           <!-- <i class="el-icon-close"  v-if="ruleForm[v.key_name]"  @click="handleRemove(v.key_name)" style="position:absolute;top:-6px;left:142px;color:red;font-size:20px;"></i> -->
         </div>
-
+        <!-- <div v-html="disclaimer" v-if="v.type==12"></div>
+        <div class="viewhover" v-if="v.type==12">
+            <div class="boder" @click="add(v.key_name)">
+              <img :src="ruleForm[v.key_name]"  v-if="ruleForm[v.key_name]" />
+              <i class="el-icon-plus" v-else></i>
+            </div>
+        </div> -->
       </el-form-item>
     </el-form>
     <div style="margin-top:10px; text-align:center;">
       <el-button size="large" type="primary" class="next" style="width:200px;" @click="submitinfo()">提交</el-button>
     </div>
+    <el-dialog
+      title="电子签字区"
+      :visible.sync="centerDialogVisible"
+      width="100%"
+      :show-close="false"
+      center>
+      <div class="boder2">
+        <vueSignature ref="signature" :w="'100%'" :h="'12rem'" :sigOption="option"></vueSignature>
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="clear">取 消</el-button>
+        <el-button type="primary" @click="endHandler">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <style lang="less">
@@ -101,14 +124,43 @@
   float: left;
   margin-right:10px;
 }
+.viewhover{
+  background: #ffffff;
+  margin-bottom: .2rem;
+  box-sizing: border-box;
+  padding-bottom: .2rem;
+}
+.boder{
+  border: .01rem solid #0095FF;
+  margin: 0 .2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // width: 100%;
+  height: 6rem;
+  img{
+    width: 100%;
+    height: 6rem;
+  }
+}
+.boder2{
+  border: .01rem solid #0095FF;
+  // display: flex;
+  // align-items: center;
+  // justify-content: center;
+  margin: .2rem;
+}
 </style>
 <script>
-import Cookies from 'js-cookie';
 import { regionData, CodeToText } from "element-china-area-data";
 import COS from 'cos-js-sdk-v5'
 import { getconfig } from '@/api/api'
+import vueSignature from "vue-signature"
 export default {
-  props: ["attrs"],
+  props: ["attrs","disclaimer"],
+  components: {
+    vueSignature
+  },
   data(){
     return{
       loadingstate:'',
@@ -122,7 +174,13 @@ export default {
       memberinfos:this.memberinfo,
       show:false,
       uploadUrl: "https://cos.wenjuan.online/",
-      cos: null
+      cos: null,
+      option: {
+          panColor: "rgb(0,0,0)",
+          bacgroundColor: "rgb(245,245,245)"
+      },
+      centerDialogVisible: false,
+      key: ''
     }
   },
   watch:{
@@ -134,32 +192,70 @@ export default {
     }
   },
   methods:{
+    clear() {
+      this.$refs.signature.clear();
+      if(this.ruleForm[this.key]) {
+        this.$set(this.ruleForm, this.key, '');
+      }
+      this.centerDialogVisible = false
+    },
+    add(key) {
+      this.key = key
+      this.centerDialogVisible = true
+    },
+    endHandler() {
+      var png = this.$refs.signature.save()
+      let that = this
+      let file = {
+          content: png,
+          imgkey: 'file'
+      }
+      var arr = file.content.split(','), mime = arr[0].match(/:(.*?);/)[1],
+      bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+      while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+      }
+      var imgkey = 'file'
+
+      let suffix = file.content.split(';')[0].split(':')[1].split('/')[1];
+      var filename = 'wenjuanh5/'+  String(new Date().getTime())+'.'+suffix;
+      var files = new File([u8arr], `${imgkey}/${filename}`, {type: mime})
+      console.log(files)
+      this.cos.putObject({
+        Bucket: 'gangan-1305592971', /* 必须 */
+        Region: 'ap-nanjing',     /* 存储桶所在地域，必须字段 */
+        Key: filename,          /* 必须 */ //这里一般用于做拼接字符上传文件名称
+        StorageClass: 'STANDARD',
+        Body: files, // 上传文件对象
+            onTaskReady:(progressData)=>{},//上传任务创建时的回调函数，返回一个 taskId，唯一标识上传任务，可用于上传任务的取消（cancelTask），停止（pauseTask）和重新开始（restartTask）
+            onProgress:(progressData)=>{},//文件上传中返回的事件，loaded: 文件大小, total: 已上传大小, speed: 上传速度, percent: 上传进度
+            onHashprogress:(progressData)=>{},//文件上传中返回的事件
+        },function(err,data){
+            // console.log(err,data);  // 上传成功返回给你的
+            that.$set(that.ruleForm, that.key, that.uploadUrl+filename);
+            that.centerDialogVisible = false
+        })
+    },
     setOptions(list){
       list.forEach((value,index)=>{
         if(value.value){
           this.$set(this.ruleForm,value.key_name,value.value)
         }else{
-          if(value.type == 3||value.type == 4||value.type == 9||value.type == 10){
-            if(typeof(value.options)=='string') value.options = JSON.parse(value.options);
-            if(value.type == 4) {
-              this.$set(this.ruleForm,value.key_name,[])
-            } else {
-              this.$set(this.ruleForm,value.key_name,'')
-            }
-
+          if(value.type == 'multiple'){
+            this.$set(this.ruleForm, value.key_name,[])
           } else {
             this.$set(this.ruleForm, value.key_name, '');
           }
         }
         let rules   =   [];
         let actionwords =   "选择";
-        if(value.type==1||value.type==2)
+        if(value.type=='text')
         {
             actionwords =   "输入";
         }
-        if(value.required==1)
+        if(value.require==1)
         {
-            if(value.type==4)
+            if(value.type=='multiple')
             {
                 rules.push({ type: 'array', required: true, message: '请'+actionwords+value.show_name, trigger: 'blur change' });
             }else{
@@ -169,30 +265,6 @@ export default {
         if(value.rules)
         {
             rules.push({ pattern:eval(value.rules), message: value.show_name+'格式有误', trigger: 'blur' });
-        }
-
-        //证件号码
-        if(value.key_name=='mv_idnumber')
-        {
-            rules.push({ validator: (rule, value, callback) => {
-                //判断当前的 证件证类型
-                let idtype  =   this.ruleForm['mv_idtype'];
-                if(idtype=='身份证')
-                {
-                    if(!this.$util.IsIdCardNo(value)){
-                        return callback(new Error('证件格式有误'));
-                    }else{
-                        if (parseInt(value.substr(16, 1)) % 2 == 1) {
-                            this.ruleForm['mv_sex']='男';
-                        } else {
-                            this.ruleForm['mv_sex']='女';
-                        }
-                    }
-                }
-
-                callback();
-
-            }, trigger: 'blur change' });
         }
 
         value.validaterules   =   rules;
@@ -305,17 +377,7 @@ export default {
               if(value.key_name==i)
               {
                 delete value.validaterules;
-                if(value.type==8)
-                {
-                    //去重复
-                    var loc = "";
-                    for (let j = 0; j < this.ruleForm[i].length; j++) {
-                      loc += CodeToText[this.ruleForm[i][j]] + '/';
-                    }
-                    value.value =  loc.substring(0,loc.length-1);
-                }else{
-                    value.value =  this.ruleForm[i];
-                }
+                value.value =  this.ruleForm[i];
               }
             }
           })
@@ -351,3 +413,9 @@ export default {
   }
 }
 </script>
+<style scoped lang="less">
+.block {
+  display: block;
+  margin-bottom: 10px;
+}
+</style>

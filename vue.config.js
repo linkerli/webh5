@@ -15,7 +15,7 @@ module.exports = {
       port: 8080,
       proxy: {
         "/api/": {
-          target: 'http://wenjuan.test/',
+          target: 'http://zhike.api.test/',
           pathRewrite: { "^/api/": "" },
           secure: false,
           changeOrigin: true

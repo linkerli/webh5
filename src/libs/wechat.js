@@ -51,7 +51,7 @@ export default {
 
     getWechatCode(scope) {
         if (!scope) scope = 'snsapi_userinfo'
-        let encodeurl = encodeURIComponent("https://h5.wenjuan.online/getwechatcode/getcode.php?redirect_url=" + window.location.origin + window.location.pathname);
+        let encodeurl = encodeURIComponent("https://h5.wenjuan.outnice.cn/getwechatcode/getcode.php?redirect_url=" + window.location.origin + window.location.pathname);
         let jumpurl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + process.env.VUE_APP_WECHAT_APPID + "&redirect_uri=" + encodeurl + "&response_type=code&scope=" + scope + "&state=authorize_wechat#wechat_redirect";
         window.location.href = jumpurl;
     },

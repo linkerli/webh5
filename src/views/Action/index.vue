@@ -1,8 +1,7 @@
 <template>
     <div>
-
         <div v-loading="loading" class="page-container page-component">
-            <mvform :attrs="gattrs" @getAuth="addsuccess"></mvform>
+            <mvform :attrs="gattrs" :disclaimer="matchinfo.disclaimer" @getAuth="addsuccess"></mvform>
             <transition name="back-top-fade">
                 <div class="page-component-up"
                      :class="{ 'hover': hover }"
@@ -38,22 +37,17 @@
                 matchInfo({acid: this.$route.params.acid}).then((res) => {
                     if (res.status === 200) {
                         that.matchinfo = res.data;
-                        that.gattrs = res.data.registerform?JSON.parse(res.data.registerform):[]
+                        res.data.questions.forEach(item=>{
+                          item.key_name = 'keyname'+ item.id
+                        })
+                        that.gattrs = res.data.questions
                         if(res.data.jumpurl &&  res.data.jumpurl.indexOf('http') !==-1) {
                           let urid = localStorage.getItem('urid')
                           window.location.href = res.data.jumpurl+'?uid='+urid
                           return
                         }
                         if(res.data.isuser) {
-                          if(res.data.id != 4) {
-                            this.$router.replace({name:'finish'})
-                            return
-                          }
-                          let userform = res.data.userform?JSON.parse(res.data.userform):{}
-                          that.gattrs.forEach((item)=>{
-                            if(item.type == 1)
-                              item.value = userform[item.key_name]||''
-                          })
+                          this.$router.replace({name:'finish'})
                         }
 
                         that.flag   =   true;

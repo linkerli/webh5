@@ -33,7 +33,7 @@ export const setfaceshare = data => {
 };
 export const getconfig = data => {
   return axios.request({
-    url: "public/cosconfig",
+    url: "api/cosconfig",
     method: "post",
     data
   });
